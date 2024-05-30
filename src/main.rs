@@ -12,6 +12,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let opts = CliOpts::parse();
     println!("Parsing entry point at {}", opts.filename.display());
 
-    tokenize(File::open(opts.filename)?)?;
+    let tokens = tokenize(File::open(opts.filename)?)?;
+    dbg!(tokens);
     Ok(())
 }

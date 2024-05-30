@@ -1,0 +1,4 @@
+fun main() {
+  let a <<= 12 + 14 && false;
+  println("Hello World");
+}

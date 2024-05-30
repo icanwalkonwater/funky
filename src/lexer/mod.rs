@@ -10,9 +10,21 @@ pub enum TokenKind {
     LiteralString,
     /// 'c' 'a' '\n'
     LiteralChar,
+    /// true, false
+    LiteralBool,
 
-    /// Keywords and identifiers
+    /// Identifiers
     Identifier,
+    /// Keyword let
+    KeywordLet,
+    /// Keyword mut
+    KeywordMut,
+    /// Keyword fun
+    KeywordFun,
+    /// Keyword struct
+    KeywordStruct,
+    /// Keyword impl
+    KeywordImpl,
 
     /// //
     SlashSlash,
@@ -315,11 +327,42 @@ impl<'a> Lexer<'a> {
     }
 
     fn advance_identifier_or_keyword(&mut self) -> Token {
-        todo!()
+        let start = self.position();
+        let first_char = self.advance();
+        assert!(first_char.is_alphabetic());
+
+        // FIXME: This is probably a bit flawed
+        self.advance_while(|d| d.is_alphanumeric() || d == '_');
+        let end = self.position();
+
+        let ident = &self.contents[start..end];
+        // Try to recognize keywords
+        let kind = match ident {
+            "let" => TokenKind::KeywordLet,
+            "mut" => TokenKind::KeywordMut,
+            "fun" => TokenKind::KeywordFun,
+            "struct" => TokenKind::KeywordStruct,
+            "impl" => TokenKind::KeywordImpl,
+            "true" | "false" => TokenKind::LiteralBool,
+            _ => TokenKind::Identifier,
+        };
+
+        Token::new(kind, end - start)
     }
 
     fn advance_literal_number(&mut self) -> Token {
-        todo!()
+        let start = self.position();
+
+        // We define a number as a sequence of numbers and letters with exactly one dot
+        // FIXME: This is obviously flawed and doesn't take into account exponent notation among
+        // many other things.
+        self.advance_while(|d| d.is_ascii_alphanumeric());
+        if self.peek_first() == Some('.') {
+            self.advance_while(|d| d.is_ascii_alphanumeric());
+        }
+
+        let end = self.position();
+        Token::new(TokenKind::LiteralInt, end - start)
     }
 
     fn advance_literal_char(&mut self) -> Token {
@@ -364,9 +407,9 @@ impl<'a> Lexer<'a> {
         self.position
     }
 
-    fn advance(&mut self) {
+    fn advance(&mut self) -> char {
         self.position += 1;
-        self.iter.next().unwrap();
+        self.iter.next().unwrap()
     }
 
     fn advance_by(&mut self, n: usize) {
