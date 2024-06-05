@@ -1,7 +1,6 @@
-use std::{fs::File, path::PathBuf};
+use std::{fs::File, io::Read, path::PathBuf};
 
-use clap::Parser;
-use funky::lexer::tokenize;
+use pest::Parser;
 
 #[derive(Debug, clap::Parser)]
 struct CliOpts {
@@ -9,10 +8,14 @@ struct CliOpts {
 }
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let opts = CliOpts::parse();
-    println!("Parsing entry point at {}", opts.filename.display());
+    let opts = <CliOpts as clap::Parser>::parse();
 
-    let tokens = tokenize(File::open(opts.filename)?)?;
-    dbg!(tokens);
+    let mut source_file = File::open(&opts.filename)?;
+    let mut code = String::new();
+    source_file.read_to_string(&mut code)?;
+
+    let res = funky::FunkyParser::parse(funky::Rule::File, &code);
+    dbg!(&res);
+
     Ok(())
 }

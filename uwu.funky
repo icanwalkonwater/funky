@@ -1,4 +1,8 @@
-fun main() {
-  let a <<= 12 + 14 && false;
-  println("Hello World");
+funk main() {
+  a <<= 12 + 14 && false;
+  let b = 1.12;
+  // println("Hello World");
+  1 + 1 * 5 / (1 + 5);
+  "hello";
+  a = 12;
 }
