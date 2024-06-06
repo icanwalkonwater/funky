@@ -1,5 +1,6 @@
 use pest_derive::Parser;
 
+pub mod ast;
 pub mod lexer;
 
 #[derive(Parser)]
