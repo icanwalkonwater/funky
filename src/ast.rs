@@ -1,10 +1,10 @@
 #[derive(Debug, Clone)]
 pub struct File {
-    pub functions: Vec<Function>,
+    pub functions: Vec<FunctionDefinition>,
 }
 
 #[derive(Debug, Clone)]
-pub struct Function {
+pub struct FunctionDefinition {
     pub name: Identifier,
     pub parameters: Vec<FunctionParameter>,
     pub return_type: Option<Type>,
@@ -79,8 +79,9 @@ pub enum BinaryOperator {
     ShiftRight,
 
     Equal,
-    LessThan,
-    LessThanOrEqual,
+    NotEqual,
+    LowerThan,
+    LowerThanOrEqual,
     GreaterThan,
     GreaterThanOrEqual,
     And,
@@ -89,6 +90,7 @@ pub enum BinaryOperator {
 
 #[derive(Debug, Clone)]
 pub enum UnaryOperator {
+    Nothing,
     Negate,
     Not,
     Complement,

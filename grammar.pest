@@ -4,80 +4,78 @@ COMMENT = _{
     | "/*" ~ (!"*/" ~ ANY)* ~ "*/"
 }
 
+File               = { SOI ~ FunctionDefinition* ~ EOI }
+FunctionDefinition = { "funk" ~ Identifier ~ "(" ~ ")" ~ Block }
+Block              = { "{" ~ Statement* ~ Expression? ~ "}" }
 
-File = { SOI ~ Function* ~ EOI }
+// Statements
 
-Function = { "funk" ~ Identifier ~ "(" ~ FunctionParameters? ~ ")" ~ Block }
-FunctionParameters = {
-    FunctionParameter
-    | FunctionParameter ~ ("," ~ FunctionParameter+)
-}
-FunctionParameter = { Identifier ~ ":" ~ Type }
-
-// TODO
-Type = { Identifier }
-
-Block = { "{" ~ Statement* ~ "}" }
-
-Statement = {
-    AssignementStatement
-    | VariableDeclarationStatement
-    | ExpressionStatement
-}
-VariableDeclarationStatement = { "let" ~ Identifier ~ "=" ~ !"=" ~ Expression ~ ";" }
-
-AssignementStatement = { Expression ~ AssignementOperator ~ Expression ~ ";" }
-AssignementOperator = @{ ("+" | "-" | "*" | "/" | "<<" | ">>" | "|" | "&")? ~ "=" }
+Statement                      =  { AssignementStatement | VariableDeclarationStatement | ExpressionStatement }
+  VariableDeclarationStatement =  { "let" ~ Identifier ~ "=" ~ !"=" ~ Expression ~ ";" }
+  AssignementStatement         =  { Expression ~ AssignementOperator ~ Expression ~ ";" }
+  AssignementOperator          = @{ ("+" | "-" | "*" | "/" | "<<" | ">>" | "|" | "&")? ~ "=" }
 
 ExpressionStatement = { Expression ~ ";" }
 
 // Math like expressions
 
-Expression = { BoolOrExpression }
+Expression                 =  { ExpressionPrefixOperator* ~ ExpressionAtom ~ (ExpressionInfixOperator ~ ExpressionPrefixOperator* ~ ExpressionAtom)* }
+  ExpressionPrefixOperator = _{ Noop | Negate | Complement | Not }
+    Noop                   =  { "+" }
+    Negate                 =  { "-" }
+    Complement             =  { "~" }
+    Not                    =  { "!" }
+  ExpressionInfixOperator  = _{ Or | And | Add | Substract | Multiply | Divide | ShiftLeft | ShiftRight | BitAnd | BitOr | BitXor | LowerEqual | LowerThan | GreaterEqual | GreaterThan | Equal | NotEqual }
+    Or                     =  { "||" }
+    And                    =  { "&&" }
+    Add                    =  { "+" }
+    Substract              =  { "-" }
+    Multiply               =  { "*" }
+    Divide                 =  { "/" }
+    ShiftLeft              =  { "<<" }
+    ShiftRight             =  { ">>" }
+    BitAnd                 =  { "&" }
+    BitOr                  =  { "|" }
+    BitXor                 =  { "^" }
+    LowerEqual             =  { "<=" }
+    LowerThan              =  { "<" }
+    GreaterEqual           =  { ">=" }
+    GreaterThan            =  { ">" }
+    Equal                  =  { "==" }
+    NotEqual               =  { "!=" }
+  ExpressionAtom           =  { "(" ~ Expression ~ ")" | Block | Literal | Identifier }
 
-BoolOrExpression = { BoolAndExpression ~ ("||" ~ BoolAndExpression)* }
-
-BoolAndExpression = { CompareExpression ~ ("&&" ~ CompareExpression)* }
-
-CompareExpression = { BitwiseExpression ~ (CompareOperator ~ BitwiseExpression)* }
-CompareOperator = @{ "<=" | ">=" | "<" | ">" | "==" }
-
-BitwiseExpression = { BitShiftExpression ~ (BitwiseOperator ~ BitShiftExpression)* }
-BitwiseOperator = @{ "&" | "|" | "^" }
-
-BitShiftExpression = { SumExpression ~ (BitShiftOperator ~ SumExpression)* }
-BitShiftOperator = @{ "<<" | ">>" }
-
-SumExpression = { FactorExpression ~ (SumOperator ~ FactorExpression)* }
-SumOperator = @{ "+" | "-" }
-
-FactorExpression = { UnaryExpression ~ (FactorOperator ~ UnaryExpression)* }
-FactorOperator = @{ "*" | "/" }
-
-UnaryExpression = {
-    UnaryOperator ~ UnaryExpression
-    | AtomExpression
-}
-UnaryOperator = @{ "+" | "-" | "~" | "!" }
-
-AtomExpression = { "(" ~ Expression ~ ")" | Literal | Identifier }
+/*
+Expression           =  { BoolOrExpression }
+  BoolOrExpression   =  { BoolAndExpression ~ ("||" ~ BoolAndExpression)* }
+  BoolAndExpression  =  { CompareExpression ~ ("&&" ~ CompareExpression)* }
+  CompareExpression  =  { BitwiseExpression ~ (CompareOperator ~ BitwiseExpression)* }
+    CompareOperator  = @{ "<=" | ">=" | "<" | ">" | "==" | "!=" }
+  BitwiseExpression  =  { BitShiftExpression ~ (BitwiseOperator ~ BitShiftExpression)* }
+    BitwiseOperator  = @{ "&" | "|" | "^" }
+  BitShiftExpression =  { SumExpression ~ (BitShiftOperator ~ SumExpression)* }
+    BitShiftOperator = @{ "<<" | ">>" }
+  SumExpression      =  { FactorExpression ~ (SumOperator ~ FactorExpression)* }
+    SumOperator      = @{ "+" | "-" }
+  FactorExpression   =  { UnaryExpression ~ (FactorOperator ~ UnaryExpression)* }
+    FactorOperator   = @{ "*" | "/" }
+  UnaryExpression    =  { UnaryOperator ~ UnaryExpression | AtomExpression }
+    UnaryOperator    = @{ "+" | "-" | "~" | "!" }
+    AtomExpression   =  { "(" ~ Expression ~ ")" | Block | Literal | Identifier }
+*/
 
 // Literals
 
 Literal = { LiteralString | LiteralFloat | LiteralInteger }
+  LiteralString = { "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
+  LiteralInteger = @{ LiteralBinary | LiteralHexadecimal | LiteralDecimal }
+  LiteralFloat = @{
+      LiteralDecimal ~ ("." ~ LiteralDecimal)? ~ ("e" | "E") ~ ("+" | "-")? ~ LiteralDecimal
+      | LiteralDecimal ~ "." ~ LiteralDecimal
+      | LiteralDecimal ~ "." ~ !"." ~ !"_" ~ !XID_START
+  }
+  LiteralDecimal     = @{ ASCII_DIGIT ~ (ASCII_DIGIT | "_")* }
+  LiteralBinary      = @{ "0b" ~ ASCII_BIN_DIGIT ~ (ASCII_BIN_DIGIT | "_")* }
+  LiteralHexadecimal = @{ "0x" ~ ASCII_HEX_DIGIT ~ (ASCII_HEX_DIGIT | "_")* }
 
-LiteralString = { "\"" ~ (!"\"" ~ ANY)* ~ "\"" }
-
-LiteralInteger = @{ LiteralBinary | LiteralHexadecimal | LiteralDecimal }
-
-LiteralFloat = @{
-    LiteralDecimal ~ ("." ~ LiteralDecimal)? ~ ("e" | "E") ~ ("+" | "-")? ~ LiteralDecimal
-    | LiteralDecimal ~ "." ~ LiteralDecimal
-    | LiteralDecimal ~ "." ~ !"." ~ !"_" ~ !XID_START
-}
-
-LiteralDecimal = @{ ASCII_DIGIT ~ (ASCII_DIGIT | "_")* }
-LiteralBinary = @{ "0b" ~ ASCII_BIN_DIGIT ~ (ASCII_BIN_DIGIT | "_")* }
-LiteralHexadecimal = @{ "0x" ~ ASCII_HEX_DIGIT ~ (ASCII_HEX_DIGIT | "_")* }
-
-Identifier = @{ (XID_START | "_") ~ XID_CONTINUE* }
+Identifier            = @{ (XID_START | "_") ~ XID_CONTINUE* }
