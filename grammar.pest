@@ -13,7 +13,16 @@ Block              = { "{" ~ Statement* ~ Expression? ~ "}" }
 Statement                      =  { AssignementStatement | VariableDeclarationStatement | ExpressionStatement }
   VariableDeclarationStatement =  { "let" ~ Identifier ~ "=" ~ !"=" ~ Expression ~ ";" }
   AssignementStatement         =  { Expression ~ AssignementOperator ~ Expression ~ ";" }
-  AssignementOperator          = @{ ("+" | "-" | "*" | "/" | "<<" | ">>" | "|" | "&")? ~ "=" }
+  AssignementOperator          = _{ Assign | AddAssign | SubstractAssign | MultiplyAssign | DivideAssign | ShiftLeftAssign | ShiftRightAssign | BitOrAssign | BitAndAssign }
+    Assign                     =  { "=" }
+    AddAssign                 =  { "+=" }
+    SubstractAssign            =  { "-=" }
+    MultiplyAssign             =  { "*=" }
+    DivideAssign               =  { "/=" }
+    ShiftLeftAssign            =  { "<<=" }
+    ShiftRightAssign           =  { ">>=" }
+    BitOrAssign                =  { "|=" }
+    BitAndAssign               =  { "&=" }
 
 ExpressionStatement = { Expression ~ ";" }
 

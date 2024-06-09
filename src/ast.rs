@@ -21,6 +21,7 @@ pub struct FunctionParameter {
 pub enum Statement {
     Assignement {
         lvalue: Expression,
+        operator: AssignOperator,
         rvalue: Expression,
     },
     VariableDeclaration {
@@ -63,6 +64,19 @@ pub enum Literal {
     Integer(String),
     Float(String),
     String(String),
+}
+
+#[derive(Debug, Clone)]
+pub enum AssignOperator {
+    Assign,
+    AddAssign,
+    SubstractAssign,
+    MultiplyAssign,
+    DivideAssign,
+    BitAndAssign,
+    BitOrAssign,
+    ShiftLeftAssign,
+    ShiftRightAssign,
 }
 
 #[derive(Debug, Clone)]
