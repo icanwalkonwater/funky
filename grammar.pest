@@ -54,25 +54,6 @@ Expression                 =  { ExpressionPrefixOperator* ~ ExpressionAtom ~ (Ex
     NotEqual               =  { "!=" }
   ExpressionAtom           =  { "(" ~ Expression ~ ")" | Block | Literal | Identifier }
 
-/*
-Expression           =  { BoolOrExpression }
-  BoolOrExpression   =  { BoolAndExpression ~ ("||" ~ BoolAndExpression)* }
-  BoolAndExpression  =  { CompareExpression ~ ("&&" ~ CompareExpression)* }
-  CompareExpression  =  { BitwiseExpression ~ (CompareOperator ~ BitwiseExpression)* }
-    CompareOperator  = @{ "<=" | ">=" | "<" | ">" | "==" | "!=" }
-  BitwiseExpression  =  { BitShiftExpression ~ (BitwiseOperator ~ BitShiftExpression)* }
-    BitwiseOperator  = @{ "&" | "|" | "^" }
-  BitShiftExpression =  { SumExpression ~ (BitShiftOperator ~ SumExpression)* }
-    BitShiftOperator = @{ "<<" | ">>" }
-  SumExpression      =  { FactorExpression ~ (SumOperator ~ FactorExpression)* }
-    SumOperator      = @{ "+" | "-" }
-  FactorExpression   =  { UnaryExpression ~ (FactorOperator ~ UnaryExpression)* }
-    FactorOperator   = @{ "*" | "/" }
-  UnaryExpression    =  { UnaryOperator ~ UnaryExpression | AtomExpression }
-    UnaryOperator    = @{ "+" | "-" | "~" | "!" }
-    AtomExpression   =  { "(" ~ Expression ~ ")" | Block | Literal | Identifier }
-*/
-
 // Literals
 
 Literal = { LiteralString | LiteralFloat | LiteralInteger }
