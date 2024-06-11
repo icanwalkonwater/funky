@@ -11,7 +11,7 @@ Block              = { "{" ~ Statement* ~ Expression? ~ "}" }
 // Statements
 
 Statement                      =  { AssignementStatement | VariableDeclarationStatement | ExpressionStatement }
-  VariableDeclarationStatement =  { "let" ~ Identifier ~ "=" ~ !"=" ~ Expression ~ ";" }
+  VariableDeclarationStatement =  { "let" ~ Identifier ~ ":" ~ Type ~ "=" ~ !"=" ~ Expression ~ ";" }
   AssignementStatement         =  { Expression ~ AssignementOperator ~ Expression ~ ";" }
   AssignementOperator          = _{ Assign | AddAssign | SubstractAssign | MultiplyAssign | DivideAssign | ShiftLeftAssign | ShiftRightAssign | BitOrAssign | BitAndAssign }
     Assign                     =  { "=" }
@@ -25,6 +25,8 @@ Statement                      =  { AssignementStatement | VariableDeclarationSt
     BitAndAssign               =  { "&=" }
 
 ExpressionStatement = { Expression ~ ";" }
+
+Type = { Identifier }
 
 // Math like expressions
 

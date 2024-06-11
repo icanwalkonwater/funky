@@ -15,11 +15,12 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut code = String::new();
     source_file.read_to_string(&mut code)?;
 
-    let mut res = funky::FunkyParser::parse(Rule::File, &code)?;
-    assert_eq!(res.len(), 1);
-    let file = res.next().unwrap();
+    let [file] = funky::FunkyParser::parse(Rule::File, &code)?
+        .collect::<Vec<_>>()
+        .try_into()
+        .unwrap();
 
-    assert!(file.as_rule() == funky::Rule::File);
+    assert_eq!(file.as_rule(), Rule::File);
     let file = funky::parser::parse_file(file);
 
     dbg!(file);

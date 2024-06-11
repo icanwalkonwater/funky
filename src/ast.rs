@@ -26,6 +26,7 @@ pub enum Statement {
     },
     VariableDeclaration {
         identifier: Identifier,
+        ty: Type,
         initialization: Option<Expression>,
     },
     Expression(Expression),

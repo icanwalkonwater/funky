@@ -105,14 +105,25 @@ pub fn parse_assignement_statement(pair: Pair<Rule>) -> ast::Statement {
 pub fn parse_variable_declaration_statement(pair: Pair<Rule>) -> ast::Statement {
     assert_eq!(pair.as_rule(), Rule::VariableDeclarationStatement);
 
-    let [name, initialization] = pair.into_inner().collect::<Vec<_>>().try_into().unwrap();
-    assert!(name.as_rule() == Rule::Identifier);
+    let [name, ty, initialization] = pair.into_inner().collect::<Vec<_>>().try_into().unwrap();
+    assert_eq!(name.as_rule(), Rule::Identifier);
+    let ty = parse_type(ty);
     let initialization = parse_expression(initialization);
 
     ast::Statement::VariableDeclaration {
         identifier: ast::Identifier(name.as_str().to_string()),
+        ty,
         initialization: Some(initialization),
     }
+}
+
+pub fn parse_type(pair: Pair<Rule>) -> ast::Type {
+    assert_eq!(pair.as_rule(), Rule::Type);
+
+    let [ident] = pair.into_inner().collect::<Vec<_>>().try_into().unwrap();
+    assert_eq!(ident.as_rule(), Rule::Identifier);
+
+    ast::Type(ast::Identifier(ident.as_str().to_string()))
 }
 
 pub fn parse_expression(pair: Pair<Rule>) -> ast::Expression {
